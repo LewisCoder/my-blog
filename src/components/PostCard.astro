@@ -1,0 +1,43 @@
+---
+import { Image } from 'astro:assets';
+import type { CollectionEntry } from 'astro:content';
+import FormattedDate from './FormattedDate.astro';
+
+interface Props {
+	post: CollectionEntry<'blog'>;
+	index?: number;
+}
+
+const { post, index } = Astro.props;
+---
+
+<a
+	href={`/blog/${post.id}/`}
+	class="group relative flex h-full flex-col overflow-hidden rounded-xl border border-edge bg-panel/60 no-underline backdrop-blur transition duration-300 hover:-translate-y-1 hover:border-accent/50 hover:shadow-[0_0_40px_-12px_rgba(52,211,153,0.35)]"
+>
+	{post.data.heroImage && (
+		<div class="relative overflow-hidden">
+			<Image
+				width={720}
+				height={360}
+				src={post.data.heroImage}
+				alt=""
+				class="aspect-[2/1] w-full object-cover opacity-70 grayscale-[35%] transition duration-500 group-hover:scale-[1.03] group-hover:opacity-100 group-hover:grayscale-0"
+			/>
+			<div class="absolute inset-0 bg-gradient-to-t from-panel via-panel/20 to-transparent"></div>
+		</div>
+	)}
+	<div class="flex flex-1 flex-col p-5">
+		<div class="flex items-center justify-between gap-3 font-mono text-[11px] text-slate-500">
+			<FormattedDate date={post.data.pubDate} />
+			{index != null && <span class="text-slate-600">{String(index).padStart(2, '0')}</span>}
+		</div>
+		<h2 class="mt-2 text-lg font-semibold text-slate-100 transition-colors group-hover:text-accent">
+			{post.data.title}
+		</h2>
+		<p class="mt-2 line-clamp-3 text-sm leading-6 text-slate-400">{post.data.description}</p>
+		<span class="mt-auto pt-4 font-mono text-xs text-slate-500 transition-colors group-hover:text-accent">
+			read_more →
+		</span>
+	</div>
+</a>

@@ -1,0 +1,109 @@
+@import 'tailwindcss';
+@plugin '@tailwindcss/typography';
+
+@theme {
+	--font-sans:
+		var(--font-atkinson), ui-sans-serif, system-ui, -apple-system, 'Segoe UI', 'PingFang SC',
+		'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+	--font-mono:
+		'JetBrains Mono Variable', ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono',
+		monospace;
+
+	--color-night: #080b10;
+	--color-panel: #0d131b;
+	--color-panel-2: #111a24;
+	--color-edge: #1c2734;
+	--color-accent: #34d399;
+	--color-accent-dim: #10b981;
+}
+
+@layer base {
+	html {
+		background-color: var(--color-night);
+		color-scheme: dark;
+		scroll-behavior: smooth;
+	}
+
+	body {
+		@apply text-slate-300;
+	}
+
+	::selection {
+		background-color: rgb(52 211 153 / 0.28);
+		color: #f8fafc;
+	}
+
+	* {
+		scrollbar-width: thin;
+		scrollbar-color: #263445 transparent;
+	}
+}
+
+@layer utilities {
+	.bg-grid {
+		background-image:
+			linear-gradient(to right, rgb(148 163 184 / 0.06) 1px, transparent 1px),
+			linear-gradient(to bottom, rgb(148 163 184 / 0.06) 1px, transparent 1px);
+		background-size: 48px 48px;
+		-webkit-mask-image: radial-gradient(ellipse 75% 60% at 50% 0%, #000 35%, transparent 100%);
+		mask-image: radial-gradient(ellipse 75% 60% at 50% 0%, #000 35%, transparent 100%);
+	}
+
+	.animate-blink {
+		animation: blink 1.1s step-end infinite;
+	}
+
+	@keyframes blink {
+		0%,
+		49% {
+			opacity: 1;
+		}
+		50%,
+		100% {
+			opacity: 0;
+		}
+	}
+}
+
+/* Markdown 正文：代码与引用块的终端风格 */
+.prose :not(pre) > code {
+	background-color: rgb(148 163 184 / 0.12);
+	border: 1px solid rgb(148 163 184 / 0.14);
+	border-radius: 0.375rem;
+	padding: 0.125em 0.4em;
+	font-weight: 400;
+	color: rgb(167 243 208);
+}
+
+.prose :not(pre) > code::before,
+.prose :not(pre) > code::after {
+	content: none;
+}
+
+.prose pre {
+	background-color: #0b1118;
+	border: 1px solid var(--color-edge);
+	border-radius: 0.75rem;
+	box-shadow: 0 24px 48px -32px rgb(0 0 0 / 0.9);
+}
+
+.prose blockquote {
+	background-color: rgb(52 211 153 / 0.05);
+	border-left: 2px solid var(--color-accent);
+	border-radius: 0 0.5rem 0.5rem 0;
+	padding: 0.25rem 1.25rem;
+	font-style: normal;
+}
+
+.prose blockquote p::before,
+.prose blockquote p::after {
+	content: none;
+}
+
+.prose thead {
+	border-bottom-color: var(--color-edge);
+}
+
+.prose tbody tr {
+	border-bottom-color: rgb(28 39 52 / 0.8);
+}

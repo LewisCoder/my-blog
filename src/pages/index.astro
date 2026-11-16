@@ -1,0 +1,73 @@
+---
+import { getCollection } from 'astro:content';
+import PostCard from '../components/PostCard.astro';
+import TerminalCard from '../components/TerminalCard.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { SITE_AUTHOR, SITE_ROLE } from '../consts';
+
+const allPosts = (await getCollection('blog')).sort(
+	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
+const posts = allPosts.slice(0, 3);
+const postCount = String(allPosts.length).padStart(2, '0');
+---
+
+<BaseLayout>
+	<section class="grid items-center gap-12 py-10 sm:py-16 lg:grid-cols-[1.1fr_1fr]">
+		<div>
+			<p class="font-mono text-sm text-accent">// hello, world</p>
+			<h1 class="mt-4 text-4xl font-bold leading-tight tracking-tight text-white sm:text-5xl">
+				你好，我是
+				<span
+					class="bg-gradient-to-r from-emerald-300 via-teal-200 to-cyan-300 bg-clip-text text-transparent"
+				>
+					{SITE_AUTHOR}
+				</span>
+			</h1>
+			<p class="mt-4 font-mono text-sm text-slate-500">
+				{SITE_ROLE} <span class="text-slate-600">// 记录代码与思考</span>
+			</p>
+			<p class="mt-6 max-w-xl text-lg leading-8 text-slate-400">
+				在这里记录学习笔记、技术实践与生活随想，也分享一些随手写下的小东西。
+			</p>
+			<div class="mt-8 flex flex-wrap gap-3">
+				<a
+					href="/blog/"
+					class="rounded-lg bg-accent px-5 py-2.5 font-mono text-sm font-semibold text-night no-underline shadow-[0_0_24px_-6px_rgba(52,211,153,0.6)] transition hover:bg-emerald-300"
+				>
+					查看文章 →
+				</a>
+				<a
+					href="/about/"
+					class="rounded-lg border border-edge px-5 py-2.5 font-mono text-sm text-slate-300 no-underline transition hover:border-accent/40 hover:text-accent"
+				>
+					关于我
+				</a>
+			</div>
+			<ul class="mt-10 flex flex-wrap gap-x-8 gap-y-3 font-mono text-xs text-slate-500">
+				<li><span class="text-accent">{postCount}</span> posts</li>
+				<li><span class="text-slate-300">static</span> build</li>
+				<li><span class="text-slate-300">markdown</span> driven</li>
+				<li><span class="text-slate-300">0</span> database</li>
+			</ul>
+		</div>
+		<TerminalCard />
+	</section>
+
+	<section class="mt-8 sm:mt-14">
+		<div class="flex items-end justify-between border-b border-edge pb-4">
+			<h2 class="font-mono text-sm text-slate-400">
+				<span class="text-accent">##</span> latest_posts
+			</h2>
+			<a
+				href="/blog/"
+				class="font-mono text-xs text-slate-500 no-underline transition-colors hover:text-accent"
+			>
+				view_all →
+			</a>
+		</div>
+		<div class="mt-6 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+			{posts.map((post, i) => <PostCard post={post} index={i + 1} />)}
+		</div>
+	</section>
+</BaseLayout>

@@ -1,0 +1,41 @@
+---
+import { SITE_AUTHOR, SITE_ROLE } from '../consts';
+
+const profile = `{
+  "author": "${SITE_AUTHOR}",
+  "role": "${SITE_ROLE}",
+  "lang": ["Java", "TypeScript"],
+  "focus": ["backend", "performance", "clean code"],
+  "motto": "Talk is cheap. Show me the code."
+}`;
+---
+
+<div class="relative">
+	<div
+		aria-hidden="true"
+		class="absolute -inset-1 rounded-2xl bg-gradient-to-r from-emerald-500/20 via-teal-500/10 to-cyan-500/20 blur-xl"
+	>
+	</div>
+	<div
+		class="relative overflow-hidden rounded-xl border border-edge bg-panel/90 shadow-2xl shadow-black/50 backdrop-blur"
+	>
+		<div class="flex items-center gap-2 border-b border-edge bg-panel-2/70 px-4 py-3">
+			<span class="size-2.5 rounded-full bg-[#ff5f57]"></span>
+			<span class="size-2.5 rounded-full bg-[#febc2e]"></span>
+			<span class="size-2.5 rounded-full bg-[#28c840]"></span>
+			<span class="ml-2 font-mono text-[11px] text-slate-500">~/profile.json</span>
+			<span class="ml-auto font-mono text-[10px] text-slate-600">UTF-8</span>
+		</div>
+		<div class="p-5 font-mono text-[13px] leading-6">
+			<p class="text-slate-500">
+				<span class="text-accent">$</span>
+				<span class="text-slate-300">cat profile.json</span>
+			</p>
+			<pre class="mt-3 whitespace-pre-wrap text-slate-400">{profile}</pre>
+			<p class="mt-3 text-slate-500">
+				<span class="text-accent">$</span>
+				<span class="ml-2 inline-block h-3.5 w-2 animate-blink bg-accent/80 align-middle"></span>
+			</p>
+		</div>
+	</div>
+</div>

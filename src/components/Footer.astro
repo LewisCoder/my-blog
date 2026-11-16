@@ -1,0 +1,25 @@
+---
+import { SITE_AUTHOR } from '../consts';
+
+const today = new Date();
+---
+
+<footer class="border-t border-edge bg-night/60">
+	<div
+		class="mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 py-10 font-mono text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8"
+	>
+		<p>
+			© {today.getFullYear()} {SITE_AUTHOR}
+			<span class="ml-2 text-slate-700">// built with Astro &amp; Tailwind CSS</span>
+		</p>
+		<div class="flex items-center gap-5">
+			<a href="/rss.xml" class="no-underline transition-colors hover:text-accent">rss ↗</a>
+			<a
+				href="https://github.com/"
+				target="_blank"
+				rel="noreferrer"
+				class="no-underline transition-colors hover:text-accent">github ↗</a
+			>
+		</div>
+	</div>
+</footer>
