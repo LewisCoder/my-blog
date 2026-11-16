@@ -6,7 +6,8 @@ import { defineConfig, fontProviders } from 'astro/config';
 
 // https://astro.build/config
 export default defineConfig({
-	site: 'https://example.com',
+	site: 'https://lewiscoder.github.io',
+	base: '/my-blog',
 	integrations: [sitemap()],
 	vite: {
 		plugins: [tailwindcss()],

@@ -4,6 +4,7 @@ import PostCard from '../components/PostCard.astro';
 import TerminalCard from '../components/TerminalCard.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { SITE_AUTHOR, SITE_ROLE } from '../consts';
+import { withBase } from '../utils/url';
 
 const allPosts = (await getCollection('blog')).sort(
 	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
@@ -32,13 +33,13 @@ const postCount = String(allPosts.length).padStart(2, '0');
 			</p>
 			<div class="mt-8 flex flex-wrap gap-3">
 				<a
-					href="/blog/"
+					href={withBase('/blog/')}
 					class="rounded-lg bg-accent px-5 py-2.5 font-mono text-sm font-semibold text-night no-underline shadow-[0_0_24px_-6px_rgba(52,211,153,0.6)] transition hover:bg-emerald-300"
 				>
 					查看文章 →
 				</a>
 				<a
-					href="/about/"
+					href={withBase('/about/')}
 					class="rounded-lg border border-edge px-5 py-2.5 font-mono text-sm text-slate-300 no-underline transition hover:border-accent/40 hover:text-accent"
 				>
 					关于我
@@ -60,7 +61,7 @@ const postCount = String(allPosts.length).padStart(2, '0');
 				<span class="text-accent">##</span> latest_posts
 			</h2>
 			<a
-				href="/blog/"
+				href={withBase('/blog/')}
 				class="font-mono text-xs text-slate-500 no-underline transition-colors hover:text-accent"
 			>
 				view_all →

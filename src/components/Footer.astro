@@ -1,5 +1,6 @@
 ---
 import { SITE_AUTHOR } from '../consts';
+import { withBase } from '../utils/url';
 
 const today = new Date();
 ---
@@ -13,7 +14,7 @@ const today = new Date();
 			<span class="ml-2 text-slate-700">// built with Astro &amp; Tailwind CSS</span>
 		</p>
 		<div class="flex items-center gap-5">
-			<a href="/rss.xml" class="no-underline transition-colors hover:text-accent">rss ↗</a>
+			<a href={withBase('/rss.xml')} class="no-underline transition-colors hover:text-accent">rss ↗</a>
 			<a
 				href="https://github.com/"
 				target="_blank"

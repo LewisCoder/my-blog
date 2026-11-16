@@ -65,3 +65,11 @@ heroImage: '../../assets/blog-placeholder-1.jpg'
 ## 部署
 
 `npm run build` 后，`dist/` 目录即为完整静态站点，可部署到 Vercel、Netlify、GitHub Pages 或任意静态服务器（如 Nginx）。
+
+### GitHub Pages
+
+推送到 `main` 分支后，`.github/workflows/deploy.yml` 会自动构建并发布到 GitHub Pages：
+
+<https://lewiscoder.github.io/my-blog/>
+
+首次使用需在仓库 **Settings → Pages → Build and deployment** 中把 **Source** 设为 **GitHub Actions**。仓库需为公开（Public），免费的 GitHub Pages 才能对外访问。

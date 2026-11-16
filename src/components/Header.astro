@@ -1,11 +1,12 @@
 ---
 import { SITE_TITLE } from '../consts';
+import { withBase } from '../utils/url';
 import HeaderLink from './HeaderLink.astro';
 ---
 
 <header class="sticky top-0 z-30 border-b border-edge/80 bg-night/80 backdrop-blur-xl">
 	<div class="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-4 sm:px-6 lg:px-8">
-		<a href="/" class="group flex items-center gap-2 font-mono text-sm no-underline">
+		<a href={withBase('/')} class="group flex items-center gap-2 font-mono text-sm no-underline">
 			<span class="text-accent">&gt;_</span>
 			<span class="font-medium text-slate-300 transition-colors group-hover:text-white">
 				{SITE_TITLE}

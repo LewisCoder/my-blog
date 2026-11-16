@@ -3,6 +3,7 @@ import { Image } from 'astro:assets';
 import type { CollectionEntry } from 'astro:content';
 import FormattedDate from '../components/FormattedDate.astro';
 import BaseLayout from './BaseLayout.astro';
+import { withBase } from '../utils/url';
 
 type Props = CollectionEntry<'blog'>['data'];
 
@@ -12,7 +13,7 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 <BaseLayout title={title} description={description}>
 	<article class="mx-auto max-w-3xl">
 		<a
-			href="/blog/"
+			href={withBase('/blog/')}
 			class="font-mono text-xs text-slate-500 no-underline transition-colors hover:text-accent"
 		>
 			$ cd ../blog
