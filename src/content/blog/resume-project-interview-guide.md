@@ -1,5 +1,5 @@
 ---
-title: '成控智能客服 Agent：简历介绍与面试追问指南'
+title: '成控智能客服 Agent'
 description: '面向面试准备的项目陈述与追问指南：如何定位项目、怎么写简历、30 秒到 5 分钟的讲法，以及 52 个高频问题的回答示例与边界说明。'
 pubDate: '2026-11-17'
 heroImage: '../../assets/blog-placeholder-4.jpg'
