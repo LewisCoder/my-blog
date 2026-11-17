@@ -3,6 +3,7 @@ title: '高级 Agent 能力指南'
 description: 'HITL、Checkpoint 与 Handoff 的接入方式、配置示例，以及当前实现的生产环境边界。'
 pubDate: '2026-11-17'
 heroImage: '../../assets/blog-placeholder-2.jpg'
+tags: ['AI', 'Agent', 'HITL']
 ---
 
 本文覆盖 HITL、Checkpoint 与 Handoff 的当前接入方式。

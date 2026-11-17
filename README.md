@@ -43,6 +43,8 @@ description: '一句话摘要，会显示在列表页'
 pubDate: '2026-11-16'
 updatedDate: '2026-11-20'
 heroImage: '../../assets/blog-placeholder-1.jpg'
+tags: ['AI', '随笔']
+draft: false
 ---
 
 正文内容……
@@ -50,7 +52,11 @@ heroImage: '../../assets/blog-placeholder-1.jpg'
 
 - `title`、`description`、`pubDate` 为必填项
 - `updatedDate`、`heroImage` 为可选项（`heroImage` 需引用 `src/assets/` 下的图片）
+- `tags` 为标签数组，会自动生成 `/tags/` 标签页
+- `draft: true` 的草稿不会出现在列表、标签页和 RSS 中
 - 文件名即 URL：`hello-world.md` → `/blog/hello-world/`
+
+文章页会自动生成目录（TOC）、阅读时长、上一篇/下一篇导航，代码块支持一键复制；给代码块写行号区间（如 ` ```js {2-3} `）可高亮对应行。
 
 保存后首页、文章列表与 RSS 会自动更新。
 

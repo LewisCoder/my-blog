@@ -1,14 +1,12 @@
 ---
-import { getCollection } from 'astro:content';
 import PostCard from '../components/PostCard.astro';
 import TerminalCard from '../components/TerminalCard.astro';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { SITE_AUTHOR, SITE_ROLE } from '../consts';
+import { getPublishedPosts } from '../utils/posts';
 import { withBase } from '../utils/url';
 
-const allPosts = (await getCollection('blog')).sort(
-	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
-);
+const allPosts = await getPublishedPosts();
 const posts = allPosts.slice(0, 3);
 const postCount = String(allPosts.length).padStart(2, '0');
 ---

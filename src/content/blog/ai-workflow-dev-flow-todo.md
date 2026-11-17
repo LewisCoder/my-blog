@@ -3,6 +3,7 @@ title: 'AI 工作流项目（dev-flow）建设 Todo'
 description: '从 ONES 需求流入到飞书审批闸门：把 20~30 人日的 AI 工作流引擎拆成 8 个阶段，附出口标准、三条纪律与风险对策。'
 pubDate: '2026-11-17'
 heroImage: '../../assets/blog-placeholder-2.jpg'
+tags: ['AI', '工作流', 'Agent']
 ---
 
 > **B点目标**：需求从 ONES 流进来，产物在 git 里生长，决策以飞书卡片形式流到我面前，代码和部署在 agent 侧完成。

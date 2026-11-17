@@ -1,16 +1,74 @@
 ---
-import { Image } from 'astro:assets';
+import { Image, getImage } from 'astro:assets';
+import type { MarkdownHeading } from 'astro';
 import type { CollectionEntry } from 'astro:content';
 import FormattedDate from '../components/FormattedDate.astro';
-import BaseLayout from './BaseLayout.astro';
+import TagList from '../components/TagList.astro';
+import { SITE_AUTHOR } from '../consts';
+import { getReadingTime } from '../utils/reading-time';
 import { withBase } from '../utils/url';
+import BaseLayout from './BaseLayout.astro';
 
-type Props = CollectionEntry<'blog'>['data'];
+interface Props {
+	post: CollectionEntry<'blog'>;
+	headings: MarkdownHeading[];
+	/** 更早的一篇 */
+	prev?: CollectionEntry<'blog'>;
+	/** 更新的一篇 */
+	next?: CollectionEntry<'blog'>;
+}
 
-const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
+const { post, headings, prev, next } = Astro.props;
+const { title, description, pubDate, updatedDate, heroImage, tags } = post.data;
+
+const toc = headings.filter((heading) => heading.depth === 2 || heading.depth === 3);
+const readingTime = getReadingTime(post.body);
+
+const siteURL = Astro.site ?? new URL(Astro.url.origin);
+
+// 社交平台推荐的 1200x630 分享图（jpg 兼容性最好）
+const ogImage = heroImage
+	? {
+			src: (
+				await getImage({ src: heroImage, width: 1200, height: 630, fit: 'cover', format: 'jpg' })
+			).src,
+			width: 1200,
+			height: 630,
+		}
+	: undefined;
+const article = {
+	publishedTime: pubDate.toISOString(),
+	...(updatedDate ? { updatedTime: updatedDate.toISOString() } : {}),
+	author: SITE_AUTHOR,
+	tags,
+};
+
+const jsonLd: Record<string, unknown> = {
+	'@context': 'https://schema.org',
+	'@type': 'BlogPosting',
+	headline: title,
+	description,
+	datePublished: pubDate.toISOString(),
+	...(updatedDate ? { dateModified: updatedDate.toISOString() } : {}),
+	author: { '@type': 'Person', name: SITE_AUTHOR },
+	...(ogImage ? { image: new URL(ogImage.src, siteURL).href } : {}),
+	mainEntityOfPage: {
+		'@type': 'WebPage',
+		'@id': new URL(Astro.url.pathname, siteURL).href,
+	},
+	inLanguage: 'zh-CN',
+	...(tags.length ? { keywords: tags.join(', ') } : {}),
+};
 ---
 
-<BaseLayout title={title} description={description}>
+<BaseLayout
+	title={title}
+	description={description}
+	image={ogImage}
+	type="article"
+	article={article}
+	jsonLd={jsonLd}
+>
 	<article class="mx-auto max-w-3xl">
 		<a
 			href={withBase('/blog/')}
@@ -22,10 +80,12 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 			<div class="flex flex-wrap items-center gap-x-4 gap-y-1 font-mono text-xs text-slate-500">
 				<span><span class="text-accent">#</span> <FormattedDate date={pubDate} /></span>
 				{updatedDate && <span class="text-slate-600">updated <FormattedDate date={updatedDate} /></span>}
+				<span class="text-slate-600">~{readingTime} min read</span>
 				<span class="text-slate-600">markdown</span>
 			</div>
 			<h1 class="mt-4 text-3xl font-bold tracking-tight text-white sm:text-4xl">{title}</h1>
 			<p class="mt-4 font-mono text-sm leading-7 text-slate-400">// {description}</p>
+			<TagList tags={tags} class="mt-5" />
 		</header>
 		{heroImage && (
 			<Image
@@ -36,11 +96,66 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 				class="mt-8 aspect-[2/1] w-full rounded-xl border border-edge object-cover opacity-90"
 			/>
 		)}
+		{
+			toc.length > 1 && (
+				<details class="group mt-8 rounded-xl border border-edge bg-panel/50" open>
+					<summary class="flex cursor-pointer list-none items-center gap-2 px-5 py-3 font-mono text-sm text-slate-400 transition-colors hover:text-accent [&::-webkit-details-marker]:hidden">
+						<span class="text-accent">##</span> contents
+						<span class="ml-auto text-xs text-slate-600 transition-transform group-open:rotate-180">
+							▾
+						</span>
+					</summary>
+					<nav class="px-5 pb-4">
+						<ol class="space-y-1.5 font-mono text-xs leading-5">
+							{toc.map((heading) => (
+								<li class={heading.depth === 3 ? 'pl-4' : ''}>
+									<a
+										href={`#${heading.slug}`}
+										class="text-slate-500 no-underline transition-colors hover:text-accent"
+									>
+										<span class="text-slate-600">{heading.depth === 3 ? '└' : '├'}</span>
+										{heading.text}
+									</a>
+								</li>
+							))}
+						</ol>
+					</nav>
+				</details>
+			)
+		}
 		<div
 			class="prose prose-invert prose-emerald mt-10 max-w-none prose-headings:font-semibold prose-a:no-underline prose-li:leading-7 prose-p:leading-8 hover:prose-a:underline"
 		>
 			<slot />
 		</div>
+
+		{(prev || next) && (
+			<nav class="mt-12 grid gap-3 border-t border-edge pt-6 sm:grid-cols-2">
+				{prev && (
+					<a
+						href={withBase(`/blog/${prev.id}/`)}
+						class="group rounded-lg border border-edge bg-panel/40 p-4 no-underline transition-colors hover:border-accent/40"
+					>
+						<span class="font-mono text-xs text-slate-600">← older</span>
+						<p class="mt-1 text-sm text-slate-300 transition-colors group-hover:text-accent">
+							{prev.data.title}
+						</p>
+					</a>
+				)}
+				{next && (
+					<a
+						href={withBase(`/blog/${next.id}/`)}
+						class="group rounded-lg border border-edge bg-panel/40 p-4 text-right no-underline transition-colors hover:border-accent/40 sm:col-start-2"
+					>
+						<span class="font-mono text-xs text-slate-600">newer →</span>
+						<p class="mt-1 text-sm text-slate-300 transition-colors group-hover:text-accent">
+							{next.data.title}
+						</p>
+					</a>
+				)}
+			</nav>
+		)}
+
 		<footer class="mt-12 flex items-center gap-2 border-t border-edge pt-6 font-mono text-xs text-slate-600">
 			<span class="text-accent">$</span>
 			<span>echo "EOF"</span>
@@ -49,3 +164,36 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 		</footer>
 	</article>
 </BaseLayout>
+
+<script>
+	// 为每个代码块加上一键复制按钮
+	for (const pre of document.querySelectorAll<HTMLElement>('.prose pre')) {
+		const code = pre.querySelector('code');
+		if (!code) continue;
+
+		const frame = document.createElement('div');
+		frame.className = 'code-frame';
+		pre.parentNode?.insertBefore(frame, pre);
+		frame.appendChild(pre);
+
+		const button = document.createElement('button');
+		button.type = 'button';
+		button.className = 'code-copy';
+		button.textContent = 'copy';
+		button.setAttribute('aria-label', '复制代码');
+
+		button.addEventListener('click', async () => {
+			try {
+				await navigator.clipboard.writeText(code.innerText);
+				button.textContent = 'copied';
+			} catch {
+				button.textContent = 'failed';
+			}
+			setTimeout(() => {
+				button.textContent = 'copy';
+			}, 1500);
+		});
+
+		frame.appendChild(button);
+	}
+</script>

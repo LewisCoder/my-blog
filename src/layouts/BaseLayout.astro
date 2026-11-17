@@ -7,16 +7,40 @@ import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
 interface Props {
 	title?: string;
 	description?: string;
+	image?: { src: string; width?: number; height?: number };
+	type?: 'website' | 'article';
+	article?: {
+		publishedTime: string;
+		updatedTime?: string;
+		author: string;
+		tags?: string[];
+	};
+	jsonLd?: Record<string, unknown>;
 }
 
-const { title = SITE_TITLE, description = SITE_DESCRIPTION } = Astro.props;
+const {
+	title = SITE_TITLE,
+	description = SITE_DESCRIPTION,
+	image,
+	type,
+	article,
+	jsonLd,
+} = Astro.props;
 const pageTitle = title === SITE_TITLE ? title : `${title} | ${SITE_TITLE}`;
 ---
 
 <!doctype html>
 <html lang="zh-CN">
 	<head>
-		<BaseHead title={pageTitle} description={description} />
+		<BaseHead
+			title={title}
+			pageTitle={pageTitle}
+			description={description}
+			image={image}
+			type={type}
+			article={article}
+			jsonLd={jsonLd}
+		/>
 	</head>
 	<body class="flex min-h-screen flex-col font-sans text-slate-300 antialiased">
 		<div aria-hidden="true" class="pointer-events-none fixed inset-0 -z-10 overflow-hidden">

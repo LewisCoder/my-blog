@@ -1,0 +1,35 @@
+---
+import { withBase } from '../utils/url';
+
+interface Props {
+	tags: string[];
+	/** 卡片整体是链接时传 false，避免嵌套 <a>。 */
+	linked?: boolean;
+	class?: string;
+}
+
+const { tags, linked = true, class: className = '' } = Astro.props;
+---
+
+{
+	tags.length > 0 && (
+		<ul class={`flex flex-wrap gap-2 font-mono text-xs ${className}`}>
+			{tags.map((tag) =>
+				linked ? (
+					<li>
+						<a
+							href={withBase(`/tags/${encodeURIComponent(tag)}/`)}
+							class="rounded-full border border-edge bg-panel/60 px-2.5 py-0.5 text-slate-400 no-underline transition-colors hover:border-accent/40 hover:text-accent"
+						>
+							#{tag}
+						</a>
+					</li>
+				) : (
+					<li class="rounded-full border border-edge bg-panel/60 px-2.5 py-0.5 text-slate-500">
+						#{tag}
+					</li>
+				),
+			)}
+		</ul>
+	)
+}

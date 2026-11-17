@@ -14,6 +14,10 @@ const blog = defineCollection({
 			pubDate: z.coerce.date(),
 			updatedDate: z.coerce.date().optional(),
 			heroImage: z.optional(image()),
+			// 文章标签，用于生成标签页
+			tags: z.array(z.string()).default([]),
+			// 草稿不会出现在文章列表、标签页和 RSS 里
+			draft: z.boolean().default(false),
 		}),
 });
 
