@@ -70,6 +70,6 @@ heroImage: '../../assets/blog-placeholder-1.jpg'
 
 推送到 `main` 分支后，`.github/workflows/deploy.yml` 会自动构建并发布到 GitHub Pages：
 
-<https://lewiscoder.github.io/my-blog/>
+<https://zhongliwen.com/>
 
-首次使用需在仓库 **Settings → Pages → Build and deployment** 中把 **Source** 设为 **GitHub Actions**。仓库需为公开（Public），免费的 GitHub Pages 才能对外访问。
+站点使用自定义域名，域名由 `public/CNAME` 指定。首次使用需在仓库 **Settings → Pages → Build and deployment** 中把 **Source** 设为 **GitHub Actions**。仓库需为公开（Public），免费的 GitHub Pages 才能对外访问。
