@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>参考卡片 · AI 开发流水线</title>
+<link rel="stylesheet" href="../assets/course.css">
+</head>
+<body>
+<main>
+  <header>
+    <span class="kicker">参考文档 · 可打印</span>
+    <h1>AI 开发流水线参考卡片</h1>
+    <p class="meta">
+      配套课程：<a href="../lessons/0001-executable-ticket.html">第 1 课 · 写一张 Agent 能执行的工单</a> ·
+      词汇表：<a href="glossary.html">术语表</a>
+    </p>
+  </header>
+
+  <p class="lede">
+    这张卡片把「工单 → 规格/计划 → 实现 → 验证 → 评审与文档」压缩成一页。
+    每个阶段只回答两件事：<strong>产出什么</strong>，以及<strong>什么条件下才算过关</strong>。
+  </p>
+
+  <h2>五阶段地图</h2>
+
+  <ol class="pipeline-strip">
+    <li>工单</li>
+    <li>规格与计划</li>
+    <li>实现</li>
+    <li>验证</li>
+    <li>评审与文档</li>
+  </ol>
+
+  <table>
+    <thead>
+      <tr><th>阶段</th><th>输入 → 产出</th><th>过关的闸门</th><th>主力</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>① 工单</td>
+        <td>需求意图 → 可执行工单</td>
+        <td>每条验收标准都能对应测试或命令</td>
+        <td>人来定；AI 可帮拆解</td>
+      </tr>
+      <tr>
+        <td>② 规格与计划</td>
+        <td>工单 + 代码库 → 计划（或 OpenSpec 的 proposal / design / tasks）</td>
+        <td>人审通过；没有超出工单范围的改动</td>
+        <td>AI 起草；人来审</td>
+      </tr>
+      <tr>
+        <td>③ 实现</td>
+        <td>计划 + 仓库 → 代码改动</td>
+        <td>编译通过，改动范围与计划一致</td>
+        <td>AI 主写；人抽查关键点</td>
+      </tr>
+      <tr>
+        <td>④ 验证</td>
+        <td>改动 + 验收标准 → 测试报告</td>
+        <td>测试全绿；新测试覆盖每条验收标准</td>
+        <td>人定标准；AI 写测试并运行</td>
+      </tr>
+      <tr>
+        <td>⑤ 评审与文档</td>
+        <td>diff + 工单 → Review 意见、变更说明</td>
+        <td>评审意见已处理；说明能脱离 diff 读懂</td>
+        <td>AI 起草；人签收</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div class="callout">
+    <span class="callout-title">核心原则</span>
+    Claude 只能执行你写下来的东西，也只能验证它跑得动的东西。
+    工单负责「写下来」，验证命令负责「跑得动」。
+    <a href="https://code.claude.com/docs/en/best-practices">Anthropic 最佳实践</a>把这两点视为大多数会话偏离预期的根因。
+  </div>
+
+  <h2 id="ticket-template">可执行工单模板</h2>
+
+<pre><code># 工单：&lt;一句话标题&gt;
+
+## 目标
+&lt;业务结果，1–2 句。不要写实现方案。&gt;
+
+## 范围
+- 做：&lt;本次要交付的最小行为&gt;
+- 不做：&lt;明确排除的相邻功能、重构、优化&gt;
+
+## 验收标准
+1. 当 &lt;触发条件&gt; 时，&lt;系统&gt; 应 &lt;可观察结果&gt;；可由 &lt;测试/命令&gt; 验证。
+2. …（每条都必须是可观察、可验证的）
+
+## 约束
+- 技术栈：Java / Spring Boot / JUnit 5 / Maven（按项目实际填写）
+- 必须遵守：现有分层结构、命名风格、不新增依赖（除非说明理由）
+- 必须运行：&lt;验证命令，例如 mvn -q test&gt;
+
+## 交付物
+- 代码改动、测试、一段变更说明（或 PR 描述）</code></pre>
+
+  <h2>验收标准公式</h2>
+
+  <blockquote>
+    <p>当 <strong>&lt;触发条件&gt;</strong> 时，<strong>&lt;系统&gt;</strong> 应 <strong>&lt;可观察结果&gt;</strong>；可由 <strong>&lt;测试/命令&gt;</strong> 验证。</p>
+  </blockquote>
+
+  <h3>Java 示例：任务创建接口</h3>
+  <ul>
+    <li>当 <code>POST /api/tasks</code> 收到 <code>{"title":"买菜"}</code> 时，应返回 <code>201</code>，响应体含 <code>id</code> 与 <code>createdAt</code>；由 <code>TaskControllerTest</code> 验证。</li>
+    <li>当请求缺少 <code>title</code> 时，应返回 <code>400</code>，错误码为 <code>TITLE_REQUIRED</code>；由 <code>TaskControllerTest</code> 验证。</li>
+    <li>以上两类行为都必须在 <code>mvn -q test -Dtest=TaskControllerTest</code> 下通过。</li>
+  </ul>
+
+  <h3>反例</h3>
+  <blockquote>
+    <p>「任务创建功能完善，参数校验合理，体验良好。」——没有触发条件，没有可观察结果，没有验证方式，Agent 只能靠猜。</p>
+  </blockquote>
+
+  <h2>两条可直接复制的提示词</h2>
+
+  <h3>1. 只要计划，不要代码</h3>
+<pre><code>先只输出实施计划：不要修改任何文件，也不要开始实现。
+计划必须包含：
+1. 逐条复述验收标准，并写明每一条打算用什么测试或命令验证；
+2. 要修改/新增的文件清单与实施顺序；
+3. 工单里没说清、需要我先确认的问题；
+4. 你注意到的、但超出工单范围的隐患（只列出，不要动手）。</code></pre>
+
+  <h3>2. 实现后自证</h3>
+<pre><code>按已确认的计划实现。完成后运行 &lt;验证命令&gt;。
+若失败：先诊断根因再修复，不要修改验收标准，也不要跳过失败的测试。
+最后按验收标准逐条汇报：每条标准 → 对应测试 → 实际结果。</code></pre>
+
+  <h2>质量清单</h2>
+  <ul class="checklist">
+    <li>工单能在屏幕一屏内读完（过长就拆成两个工单）。</li>
+    <li>每条验收标准都能对应至少一个测试或命令。</li>
+    <li>「不做」至少写了 1 条。</li>
+    <li>计划中每一步都能映射回某条验收标准。</li>
+    <li>验证命令是具体可执行的，不是「请确认功能正常」。</li>
+    <li>你在计划或代码里至少提出过一处修改——你在审阅，而不是盖章。</li>
+  </ul>
+
+  <h2>常见反模式</h2>
+  <table>
+    <thead><tr><th>反模式</th><th>后果</th><th>改法</th></tr></thead>
+    <tbody>
+      <tr><td>验收标准写成主观词（合理、流畅、完善）</td><td>无法验证，Agent 自我宣布完成</td><td>改成「触发条件 + 可观察结果 + 验证命令」</td></tr>
+      <tr><td>工单过大，一屏写不完</td><td>计划与 diff 都难以审阅</td><td>拆成多个小工单，逐个闭环</td></tr>
+      <tr><td>跳过计划直接让 AI 写码</td><td>方向错误时代码审阅成本极高</td><td>先要计划，人审后再实现</td></tr>
+      <tr><td>让 AI 顺手重构无关代码</td><td>diff 膨胀，风险不可控</td><td>「不做」里明确排除，越界问题只记录不动手</td></tr>
+    </tbody>
+  </table>
+
+  <div class="callout warn">
+    <span class="callout-title">规格不是越长越好</span>
+    独立评估机构 Thoughtworks 在技术雷达中提醒：规格驱动开发的产出容易冗长难审，且流程「精巧但意见化」。保持工单小、验收标准少而硬，比撰写一份完备的规格文档更可靠。
+    <a href="https://www.thoughtworks.com/radar/techniques/spec-driven-development">来源</a>
+  </div>
+
+  <h2>延伸一手资料</h2>
+  <ul>
+    <li><a href="https://code.claude.com/docs/en/best-practices">Claude Code Best Practices</a>：Tell Claude what it can't see；Give Claude a check to run。</li>
+    <li><a href="https://github.com/github/spec-kit">GitHub Spec Kit</a>：specify → plan → tasks → implement → converge。</li>
+    <li><a href="https://github.com/Fission-AI/OpenSpec">OpenSpec</a>：propose → apply → archive，轻量、适合既有代码库。</li>
+    <li><a href="https://junit.org/junit5/docs/current/user-guide/">JUnit 5 User Guide</a>：把验收标准落成测试的语法参考。</li>
+  </ul>
+
+  <footer>
+    课程资料索引见 <a href="../RESOURCES.md">RESOURCES.md</a> · 术语统一以 <a href="glossary.html">词汇表</a> 为准。
+  </footer>
+</main>
+</body>
+</html>

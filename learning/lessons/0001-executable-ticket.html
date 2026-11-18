@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>第 1 课 · 写一张 Agent 能执行的工单</title>
+<link rel="stylesheet" href="../assets/course.css">
+</head>
+<body>
+<main>
+  <header>
+    <span class="kicker">AI 工作流 · Java 后端 · 第 1 课</span>
+    <h1>写一张 Agent 能执行的工单</h1>
+    <p class="meta">
+      约 25 分钟 · 2 个练习 · 需要：一个你自己的 Java 小项目 + Claude Code<br>
+      参考卡片：<a href="../reference/pipeline-map.html">AI 开发流水线</a> ·
+      词汇表：<a href="../reference/glossary.html">课程术语</a>
+    </p>
+  </header>
+
+  <div class="callout">
+    <span class="callout-title">本课要赢得的</span>
+    把一个模糊需求写成一张<strong>可执行工单</strong>，并让 Claude 只回一份<strong>你能逐条审阅的计划</strong>。
+    这两样东西是你整条 AI 流水线的输入和第一道闸门。
+  </div>
+
+  <h2>为什么从工单开始</h2>
+
+  <p>你要建的流水线是「工单 → 规格/计划 → 实现 → 测试 → 文档/评审」。这条流水线有一个特点：<strong>后面每一步的质量上限，由最前面那张工单决定</strong>。</p>
+
+  <p>Anthropic 在官方最佳实践里把 Agent 偏离预期的原因归结为两类：Claude 缺少它无法从代码里读到的信息，或者它没有可运行的检查来证明自己做对了（<a href="https://code.claude.com/docs/en/best-practices">Best practices for Claude Code</a>）。工单恰好就是写这两件事的地方——把<strong>约束</strong>写下来，把<strong>验收标准</strong>写成检查。</p>
+
+  <p>你已经用 OpenSpec 写过 proposal（仓库里的 <code>openspec/changes/add-blog-search/</code> 就是一份），那属于流水线的第②阶段。但 proposal 的上游是工单：如果工单里的目标、验收标准和边界是松的，proposal 再精致也只是在放大模糊。</p>
+
+  <h2>整条流水线长什么样</h2>
+
+  <ol class="pipeline-strip">
+    <li>工单</li>
+    <li>规格与计划</li>
+    <li>实现</li>
+    <li>验证</li>
+    <li>评审与文档</li>
+  </ol>
+
+  <p>每个阶段都有自己的<strong>闸门</strong>（过关条件）。第①阶段的闸门只有一条：<strong>每条验收标准都能对应一个测试或命令</strong>。做不到这一条，后面的 Agent 就只能靠猜，或者靠自我声明「完成了」。完整的阶段地图、模板和提示词都在 <a href="../reference/pipeline-map.html">流水线参考卡片</a> 里。</p>
+
+  <h2>可执行工单的五要素</h2>
+
+  <table>
+    <thead>
+      <tr><th>要素</th><th>回答的问题</th><th>反例</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>目标</td><td>为什么做，业务结果是什么</td><td>「优化任务模块」</td></tr>
+      <tr><td>验收标准</td><td>完成时能观察到什么，怎么验证</td><td>「功能完善，体验良好」</td></tr>
+      <tr><td>范围边界</td><td>本次做什么、明确不做什么</td><td>只写「做」，不写「不做」</td></tr>
+      <tr><td>约束</td><td>技术栈、风格、不能碰什么、必须运行的命令</td><td>让 Agent 自行挑选新依赖</td></tr>
+      <tr><td>验证方式</td><td>用哪条命令判定「完成」</td><td>「请确认功能正常」</td></tr>
+    </tbody>
+  </table>
+
+  <h2>验收标准怎么写</h2>
+
+  <p>统一成这个句式，写不出来的就说明还没想清楚：</p>
+
+  <blockquote>
+    <p>当 <strong>&lt;触发条件&gt;</strong> 时，<strong>&lt;系统&gt;</strong> 应 <strong>&lt;可观察结果&gt;</strong>；可由 <strong>&lt;测试/命令&gt;</strong> 验证。</p>
+  </blockquote>
+
+  <h3>反例与改写（Java）</h3>
+
+  <p><strong>反例：</strong>「任务创建功能完善，参数校验合理，体验良好。」</p>
+
+  <p><strong>改写：</strong></p>
+  <ul>
+    <li>当 <code>POST /api/tasks</code> 收到 <code>{"title":"买菜"}</code> 时，应返回 <code>201</code>，响应体含 <code>id</code> 与 <code>createdAt</code>；由 <code>TaskControllerTest</code> 验证。</li>
+    <li>当请求缺少 <code>title</code> 时，应返回 <code>400</code>，错误码为 <code>TITLE_REQUIRED</code>；由 <code>TaskControllerTest</code> 验证。</li>
+    <li>以上行为在 <code>mvn -q test -Dtest=TaskControllerTest</code> 下必须全部通过。</li>
+  </ul>
+
+  <div class="callout warn">
+    <span class="callout-title">写不出验证命令？</span>
+    说明这个需求对当前这一版来说太大或太模糊。把它拆小、砍掉主观描述，直到每条标准都能被一条命令检查。
+    独立评估机构 Thoughtworks 也提醒：规格容易越写越长、越来越难审，小而硬的工单比完备的文档更可靠（<a href="https://www.thoughtworks.com/radar/techniques/spec-driven-development">技术雷达</a>）。
+  </div>
+
+  <h2>练习 A · 判断力训练</h2>
+
+  <p>下面每道题选一个答案，作答后立即看到解释。凭直觉选，选错比选对更有价值。</p>
+
+  <div class="quiz" data-quiz>
+    <p class="quiz-prompt">1. 以下哪条验收标准最适合交给 Agent 执行？</p>
+    <div class="quiz-options">
+      <button type="button" data-ok="true" data-why="它给出了触发条件、可观察结果（状态码与字段），可以用一次 HTTP 断言直接验证。">接口 GET /tasks 返回 200，正文含 items 与 total 字段</button>
+      <button type="button" data-ok="false" data-why="『优雅』『合理』是审美判断，没有命令能验证，Agent 只能自我声称。">任务列表功能完善，代码风格优雅、命名清晰合理</button>
+      <button type="button" data-ok="false" data-why="『符合预期』『流畅』都是主观词，无法转化为断言。">列表页符合产品预期，交互流畅、无明显使用问题</button>
+      <button type="button" data-ok="false" data-why="『已完成』是结论而非标准；没有说明该观察什么、怎么验证。">任务列表已完成开发，界面显示正常、无任何报错</button>
+    </div>
+  </div>
+
+  <div class="quiz" data-quiz>
+    <p class="quiz-prompt">2. 工单里「不做」这一节，最重要的作用是什么？</p>
+    <div class="quiz-options">
+      <button type="button" data-ok="true" data-why="它划出改动边界，防止 Agent 顺手重构、顺手加功能，让 diff 保持可审阅。">防止 Agent 顺手改动无关代码，控制影响范围</button>
+      <button type="button" data-ok="false" data-why="『不做』不提供背景知识，它划的是边界，不是上下文。">帮助 Agent 更快读完项目里的背景文档</button>
+      <button type="button" data-ok="false" data-why="格式完整不是目的；边界清晰才是。">让工单结构更完整，更像一份正式文档</button>
+      <button type="button" data-ok="false" data-why="『不做』只缩小范围，验收标准的数量由行为决定，不会因此减少。">减少你写验收标准所需的条目数量</button>
+    </div>
+  </div>
+
+  <div class="quiz" data-quiz>
+    <p class="quiz-prompt">3. 让 Agent 写代码之前先交计划，最大的好处是什么？</p>
+    <div class="quiz-options">
+      <button type="button" data-ok="true" data-why="计划是廉价的可审阅物；方向错了改计划，比改一整片代码便宜得多。">审一段计划远比审一整片代码便宜</button>
+      <button type="button" data-ok="false" data-why="计划不会让模型变快；它改变的是你审阅和返工的成本。">计划能让模型推理更快、响应更短</button>
+      <button type="button" data-ok="false" data-why="跳过测试等于拆掉唯一可靠的闸门，后续只能靠猜。">先写计划可以跳过测试、加快交付</button>
+      <button type="button" data-ok="false" data-why="计划会暴露矛盾，但取舍要你来做；它不会自动修复。">计划会自动补齐需求里的矛盾和遗漏</button>
+    </div>
+  </div>
+
+  <h2>练习 B · 把真实需求过一遍</h2>
+
+  <p>现在用你自己的项目，跑一遍流水线的第①→②阶段。整个过程只到「计划」为止，不写代码。</p>
+
+  <h3>步骤</h3>
+  <ol>
+    <li><strong>选需求</strong>：挑一个半天内能完成的小功能，例如「新增一个只读接口」「给列表加分页参数」。若来自工作，先去掉业务敏感信息。</li>
+    <li><strong>写工单</strong>：按 <a href="../reference/pipeline-map.html#ticket-template">模板</a> 填五要素，写进 <code>docs/tickets/0001.md</code> 之类的位置。</li>
+    <li><strong>只换计划</strong>：在练习项目的 Claude Code 会话里粘贴下面这段提示词，附上你的工单。</li>
+    <li><strong>逐条审阅</strong>：检查每条验收标准是否都有对应验证、是否越界。你至少要提出<strong>一处</strong>修改——这才是真正的审阅。</li>
+  </ol>
+
+  <h3>提示词（直接复制）</h3>
+<pre><code>下面是我的工单。先只输出实施计划：不要修改任何文件，也不要开始实现。
+
+计划必须包含：
+1. 逐条复述验收标准，并写明每一条打算用什么测试或命令验证；
+2. 要修改/新增的文件清单与实施顺序；
+3. 工单里没说清、需要我先确认的问题；
+4. 你注意到的、但超出工单范围的隐患（只列出，不要动手）。
+
+工单如下：
+&lt;粘贴你的工单&gt;</code></pre>
+
+  <div class="callout">
+    <span class="callout-title">本课的可交付物</span>
+    一份你审过、改过的计划（哪怕只改了一行），以及对应的一张工单。把它们保存在项目里，下一课会从这份计划接着往下走。
+  </div>
+
+  <h2>完成检查</h2>
+  <ul class="checklist">
+    <li>工单能在一屏内读完。</li>
+    <li>每条验收标准都能对应至少一个测试或命令。</li>
+    <li>「不做」至少写了一条。</li>
+    <li>计划覆盖了全部验收标准。</li>
+    <li>你在计划中至少提出并落实了一处修改。</li>
+  </ul>
+
+  <h2>推荐一手资料</h2>
+
+  <p>本课主要依据 <a href="https://code.claude.com/docs/en/best-practices">Best practices for Claude Code</a>（Anthropic 官方）。今天只读两节：</p>
+  <ul>
+    <li><strong>Tell Claude what it can't see</strong> —— 为什么具体提示词与项目上下文是前提；</li>
+    <li><strong>Give Claude a check to run</strong> —— 为什么可运行的检查比文字说明更可靠。</li>
+  </ul>
+
+  <h2>卡住了？</h2>
+
+  <p>我是你的老师：工单写不出来、计划看不懂、想让我陪你审一遍，直接在这里提问。也可以让我帮你拆解一个你工作里的真实需求（去掉敏感信息后）。</p>
+
+  <p>下一课会把「验证命令」变成真正的闸门：让 Claude 测试先行，自己跑、自己修，直到你确认通过。做完练习 B 再来。</p>
+
+  <nav class="lesson-nav no-print">
+    <span>← 课程起点：<a href="../MISSION.md">MISSION.md</a></span>
+    <span>参考：<a href="../reference/pipeline-map.html">流水线卡片</a> · <a href="../reference/glossary.html">词汇表</a></span>
+  </nav>
+
+  <footer>
+    本课引用的一手资料见 <a href="../RESOURCES.md">RESOURCES.md</a>。术语以 <a href="../reference/glossary.html">词汇表</a> 为准。
+  </footer>
+</main>
+<script src="../assets/quiz.js"></script>
+</body>
+</html>

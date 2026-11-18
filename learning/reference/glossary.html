@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>参考文档 · 课程词汇表</title>
+<link rel="stylesheet" href="../assets/course.css">
+</head>
+<body>
+<main>
+  <header>
+    <span class="kicker">参考文档 · 可打印</span>
+    <h1>课程词汇表</h1>
+    <p class="meta">
+      所有课程与参考文档统一使用这里的叫法。 ·
+      配套：<a href="pipeline-map.html">AI 开发流水线参考卡片</a>
+    </p>
+  </header>
+
+  <p class="lede">
+    本课程讨论 AI 工作流时的标准术语。遇到同一概念的不同叫法，以本表为准。
+  </p>
+
+  <h2>流水线</h2>
+
+  <table>
+    <tbody>
+      <tr>
+        <td><strong>工单（Ticket）</strong></td>
+        <td>描述一项待交付工作的最小单元：目标、范围、验收标准、约束、验证方式。<br><em>避免：任务卡、需求单</em></td>
+      </tr>
+      <tr>
+        <td><strong>可执行工单（Executable Ticket）</strong></td>
+        <td>一级 Agent 无需追问即可开始执行的工单：每条验收标准都对应测试或命令，且有明确的「不做」。<br><em>避免：详细工单、完整需求</em></td>
+      </tr>
+      <tr>
+        <td><strong>验收标准（Acceptance Criteria）</strong></td>
+        <td>「当 X 时，系统应 Y；由 Z 验证」形式的可观察断言。不能用测试或命令验证的，不算验收标准。<br><em>避免：完成条件、验收要点</em></td>
+      </tr>
+      <tr>
+        <td><strong>规格（Specification / Spec）</strong></td>
+        <td>对「要什么行为、为什么」的结构化描述，先于实现存在。OpenSpec 中体现为 <code>proposal.md</code> 与 <code>specs/</code>。<br><em>避免：需求文档、设计稿</em></td>
+      </tr>
+      <tr>
+        <td><strong>规格驱动开发（Spec-Driven Development, SDD）</strong></td>
+        <td>先写规格、再计划、再实现、最后对照规格验证的工作方式；Spec Kit 与 OpenSpec 都是其工具实现。<br><em>避免：文档先行、瀑布式开发</em></td>
+      </tr>
+      <tr>
+        <td><strong>计划（Plan）</strong></td>
+        <td>实现前的行动方案：改哪些文件、按什么顺序、如何验证。计划阶段不产生代码改动。<br><em>避免：方案、设计说明书</em></td>
+      </tr>
+      <tr>
+        <td><strong>计划模式（Plan Mode）</strong></td>
+        <td>Claude Code 中只做研究、不改文件的交互模式；用于在实现前获得可审阅的计划。<br><em>避免：思考模式、草稿模式</em></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>质量与验证</h2>
+
+  <table>
+    <tbody>
+      <tr>
+        <td><strong>闸门（Gate）</strong></td>
+        <td>阶段之间必须满足的通过条件，例如「测试全绿」「计划已审」。没有闸门的流水线只是自动地产生垃圾。<br><em>避免：检查点、关卡</em></td>
+      </tr>
+      <tr>
+        <td><strong>检查（Check）</strong></td>
+        <td>Agent 能自己运行的验证手段：测试、<code>mvn</code> 命令、lint、脚本。是「Give Claude a check to run」所指的对象。<br><em>避免：验证方式、确认步骤</em></td>
+      </tr>
+      <tr>
+        <td><strong>闭环（Loop）</strong></td>
+        <td>一次完整的「工单 → 计划 → 实现 → 验证 → 评审」迭代。学习的单位也是闭环：每课至少跑一次。<br><em>避免：流程、循环</em></td>
+      </tr>
+      <tr>
+        <td><strong>自证（Self-Verification）</strong></td>
+        <td>Agent 用测试或命令证明自己的产出满足验收标准，而非口头声明「已完成」。<br><em>避免：自我检查、自动确认</em></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h2>工具与上下文</h2>
+
+  <table>
+    <tbody>
+      <tr>
+        <td><strong>上下文（Context）</strong></td>
+        <td>Agent 在当前会话中能看到的信息总和：提示词、文件、项目指令、对话历史。质量与数量都受限于工作记忆。<br><em>避免：背景、环境</em></td>
+      </tr>
+      <tr>
+        <td><strong>项目指令（CLAUDE.md / AGENTS.md）</strong></td>
+        <td>随仓库保存、每次会话自动加载的项目规则文件。Claude Code 可读取 <code>AGENTS.md</code> 作为项目指令。<br><em>避免：配置文件、提示词文件</em></td>
+      </tr>
+      <tr>
+        <td><strong>子代理（Subagent）</strong></td>
+        <td>由主会话派生的独立 Agent，拥有自己的上下文窗口，用于并行或隔离的探索、实现、评审。<br><em>避免：分身、机器人</em></td>
+      </tr>
+      <tr>
+        <td><strong>无头模式（Headless Mode）</strong></td>
+        <td>以 <code>claude -p "…"</code> 非交互方式运行 Agent，可接入脚本与 CI，用退出码和 JSON 输出驱动流水线。<br><em>避免：命令行模式、批量模式</em></td>
+      </tr>
+      <tr>
+        <td><strong>钩子（Hook）</strong></td>
+        <td>在工具调用等事件上绑定的确定性检查或动作，例如「写完文件就跑测试」。用于把「应该做」变成「必然做」。<br><em>避免：回调、插件</em></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <footer>
+    术语修订会同步到每一课。 · <a href="../RESOURCES.md">RESOURCES.md</a>
+  </footer>
+</main>
+</body>
+</html>
