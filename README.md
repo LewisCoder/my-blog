@@ -16,6 +16,7 @@ npm install      # 安装依赖
 npm run dev      # 启动开发服务器，默认 http://localhost:4321
 npm run build    # 构建静态站点到 dist/
 npm run preview  # 本地预览构建结果
+npm test         # 运行搜索逻辑单元测试
 ```
 
 ## 目录结构
@@ -26,8 +27,10 @@ src/
 ├── components/         # 公共组件（页头、页脚、文章卡片等）
 ├── content/blog/       # 博客文章（Markdown）
 ├── layouts/            # BaseLayout / BlogPost 布局
-├── pages/              # 路由页面（首页、文章列表、详情、关于、404）
+├── pages/              # 路由页面（首页、文章列表、详情、标签、搜索、关于、404）
+├── scripts/            # 客户端脚本（站内搜索）
 ├── styles/global.css   # Tailwind 入口与主题配置
+├── utils/              # 文章查询、URL 与索引构建工具
 ├── consts.ts           # 站点名称、描述、作者
 └── content.config.ts   # 内容集合与 Frontmatter 校验
 ```
@@ -58,7 +61,17 @@ draft: false
 
 文章页会自动生成目录（TOC）、阅读时长、上一篇/下一篇导航，代码块支持一键复制；给代码块写行号区间（如 ` ```js {2-3} `）可高亮对应行。
 
-保存后首页、文章列表与 RSS 会自动更新。
+保存后首页、文章列表、RSS 与站内搜索索引会自动更新。
+
+## 站内搜索
+
+搜索页位于 `/search/`，完全在浏览器本地执行，没有后端服务。
+
+- 构建时由 `src/pages/search-index.json.ts` 生成 `dist/search-index.json`，收录全部已发布文章的标题、摘要、标签、日期、链接与去除 Markdown 标记后的正文
+- 打开搜索页时不加载索引，首次聚焦输入框或输入查询词时才按需请求，之后缓存在内存中
+- 支持中文分词（`Intl.Segmenter`，不支持时降级为汉字 bigram）与多个查询词 AND 匹配；结果按标题、标签、摘要、正文加权排序
+- 查询词最长 120 个字符，并同步到 URL 的 `?q=` 参数，可直接分享搜索结果
+- 草稿与关于页不会进入索引
 
 ## 自定义
 

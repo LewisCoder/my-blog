@@ -33,6 +33,13 @@
 		color: #f8fafc;
 	}
 
+	mark {
+		background-color: rgb(52 211 153 / 0.18);
+		color: rgb(167 243 208);
+		border-radius: 0.2rem;
+		padding: 0 0.1em;
+	}
+
 	* {
 		scrollbar-width: thin;
 		scrollbar-color: #263445 transparent;
