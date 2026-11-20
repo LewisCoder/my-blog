@@ -46,6 +46,46 @@
 	}
 }
 
+/* 全站搜索浮层：原生 dialog + 终端风格 */
+.search-dialog {
+	margin: auto;
+	width: min(42rem, calc(100vw - 2rem));
+	max-width: none;
+	max-height: none;
+	padding: 0;
+	border: 0;
+	background: transparent;
+	color: inherit;
+	overflow: visible;
+}
+
+.search-dialog::backdrop {
+	background-color: rgb(8 11 16 / 0.82);
+	-webkit-backdrop-filter: blur(8px);
+	backdrop-filter: blur(8px);
+}
+
+.search-dialog[open] {
+	animation: search-dialog-in 0.16s ease-out;
+}
+
+@keyframes search-dialog-in {
+	from {
+		opacity: 0;
+		transform: translateY(8px) scale(0.99);
+	}
+	to {
+		opacity: 1;
+		transform: none;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.search-dialog[open] {
+		animation: none;
+	}
+}
+
 @layer utilities {
 	.bg-grid {
 		background-image:

@@ -1,5 +1,7 @@
 # Tasks
 
+> 2026-11-20：搜索入口由独立 `/search/` 页面改为全站浮层，第 2/3 节中与页面相关的实现由第 6 节取代；索引、匹配与排序逻辑保持不变。
+
 ## 1. 构建期索引
 
 - [x] 1.1 在 `src/utils/search-index.ts` 实现 Markdown 去标记：去除围栏、标题符、强调符、链接与图片语法、HTML 标签，保留代码文本与标识符；验证：`npm run build` 后检查 `dist/search-index.json`，`body` 中不含 ``` 与 `##`，且含 `HandoffManager`（来自 advanced-agents-guide 的代码块）。
@@ -31,6 +33,14 @@
 - [x] 5.1 执行 `npm run build`，验证构建成功、`dist/search/` 与 `dist/search-index.json` 存在，既有列表、标签、文章、RSS 路由照常生成，且 `dist/sitemap-0.xml` 包含 `/search/`。
 - [x] 5.2 按 `specs/blog-search/spec.md` 的场景逐条走查（入口、范围、字段、中文匹配、归一化、排序、呈现、安全、状态、深链、键盘、性能、既有输出），全部通过。
 - [x] 5.3 检查 `package.json` 与 `package-lock.json` 无新增依赖，构建脚本未改动（新增 `npm test` 脚本，仅调用 Node 内置测试运行器）；验证：`package-lock.json` 无变化，`build` 脚本不变。
+
+## 6. 改为全站搜索浮层（重写）
+
+- [x] 6.1 删除 `src/pages/search.astro` 与 `src/scripts/blog-search.ts`，页头「搜索」导航项改为唤起浮层的按钮；验证：构建不再生成 `/search/`，任意页面页头均可见搜索按钮。
+- [x] 6.2 新增 `src/components/SearchDialog.astro`（原生 `<dialog>`、终端风格骨架）并挂载到 `BaseLayout`；验证：首页、文章列表、文章详情、标签、关于与 404 页面均包含浮层结构，未打开时不显示。
+- [x] 6.3 新增 `src/scripts/search-session.js` 无 DOM 会话状态机：预加载、空/加载/结果/无结果/错误状态、重试、迟到响应隔离、`↑`/`↓` 选中；以 `tests/search-session.test.mjs` 先行覆盖，验证：`npm test` 全绿。
+- [x] 6.4 新增 `src/scripts/search-dialog.ts`：将控制器接到浮层，渲染高亮结果，支持 Ctrl/⌘+K、Esc/遮罩/关闭按钮、Enter 打开选中结果、`?q=` 深链同步与关闭清理；验证：`npm run build` 与浏览器手动走查通过。
+- [x] 6.5 更新 `CONTEXT.md`、`README.md` 与 OpenSpec 规格/设计，统一「搜索浮层」表述；验证：文档中不再把搜索描述为独立页面。
 
 ## Workflow follow-up
 

@@ -17,7 +17,31 @@ import HeaderLink from './HeaderLink.astro';
 			<HeaderLink href="/">首页</HeaderLink>
 			<HeaderLink href="/blog/">文章</HeaderLink>
 			<HeaderLink href="/tags/">标签</HeaderLink>
-			<HeaderLink href="/search/">搜索</HeaderLink>
+			<button
+				type="button"
+				data-search-open
+				aria-haspopup="dialog"
+				aria-keyshortcuts="Control+K Meta+K"
+				class="flex items-center gap-1.5 rounded-md px-2 py-1.5 font-mono text-[13px] text-slate-400 transition-colors hover:bg-white/5 hover:text-white sm:px-3"
+			>
+				<svg
+					aria-hidden="true"
+					viewBox="0 0 20 20"
+					fill="none"
+					stroke="currentColor"
+					stroke-width="1.8"
+					class="h-3.5 w-3.5"
+				>
+					<circle cx="8.5" cy="8.5" r="4.75"></circle>
+					<path d="M12.2 12.2 16 16" stroke-linecap="round"></path>
+				</svg>
+				<span>搜索</span>
+				<kbd
+					class="hidden rounded border border-edge bg-panel px-1 py-0.5 text-[10px] leading-none text-slate-500 sm:inline-block"
+				>
+					<span data-search-shortcut>Ctrl</span>K
+				</kbd>
+			</button>
 			<HeaderLink href="/about/">关于</HeaderLink>
 			<a
 				href="https://github.com/"

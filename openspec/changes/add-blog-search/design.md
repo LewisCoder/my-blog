@@ -2,7 +2,7 @@
 
 ## Context
 
-- 站点为 Astro 7 静态构建，部署在 GitHub Pages；无适配器、无后端、无客户端框架。现有唯一的交互 JS 是 `BlogPost.astro` 中注入代码复制按钮的原生 `<script>`。
+- 站点为 Astro 7 静态构建，部署在 GitHub Pages；无适配器、无后端、无客户端框架。交互 JS 仅有 `BlogPost.astro` 中的代码复制按钮与经 BaseLayout 挂载到全站的搜索浮层，均为原生 `<script>`。
 - 内容规模：3 篇已发布文章，Markdown 合计约 68KB；内容集合通过 glob loader 加载，构建期可读取 `post.body`（原始 Markdown），`getPublishedPosts()` 已实现「排除草稿 + 按日期倒序」。
 - 当前 3 篇文章的 `pubDate` 完全相同（均为 2026-11-17），因此排序必须有独立于日期的最终稳定键。
 - 站点约定：所有链接经 `withBase()`；导航使用 `HeaderLink` 的 active 样式；终端/CLI 视觉语言（`// label`、`$ command`、mono 字体、深色 emerald 主题）；Tailwind v4 主题变量集中在 `src/styles/global.css`。
@@ -15,7 +15,7 @@
 - 零新增依赖、零后端、零构建脚本改动。
 - 中文无空格查询可用，多个查询词 AND 匹配，结果按加权相关度排序且顺序确定。
 - 索引懒加载且 gzip 体积 ≤30KB，不影响首屏。
-- 视觉与交互贴合现有终端风格；键盘基础可用、可访问。
+- 搜索以任意页面可唤出的浮层承载，不占用独立页面；视觉与交互贴合现有终端风格，键盘可用、可访问。
 - 查询支持 `?q=` 深链，并对超长查询设上限。
 
 **Non-Goals:**
@@ -39,7 +39,7 @@
 
 - `url` 字段 MUST 经 `withBase()` 生成，以便未来配置 `base` 时链接仍然有效。
 - 正文处理：去除围栏、标题符、强调符、链接与图片语法与 HTML 标签，**保留代码文本与标识符**，压缩空白。
-- 索引文件不加入 sitemap；`/search/` 页面本身按 `@astrojs/sitemap` 现有规则被收录。
+- 索引文件不加入 sitemap；站内搜索不生成独立页面，sitemap 不包含 `/search/`。
 - 不在客户端直接抓取 `.md`：源文件不进 `dist`，且会暴露未渲染内容。
 
 备选：客户端运行时拼接全文（无数据源）、服务端索引（无后端）。
@@ -78,29 +78,30 @@
 
 ### D6：索引懒加载与状态机
 
-首屏不请求索引；首次聚焦或输入时 `fetch(withBase('/search-index.json'))` 一次并缓存于内存（Promise 单例，避免并发重复请求）。带 `q` 参数的深链视为已输入，页面加载时立即请求。
+首屏不请求索引；浮层打开时预加载 `fetch(withBase('/search-index.json'))`，一次并缓存于内存（Promise 单例，避免并发重复请求）。带 `q` 参数的深链视为已打开浮层，页面加载时立即请求。索引已在缓存中时，查询同步完成，不闪现加载态。
 
-页面状态：空查询提示 → 加载中提示 → 结果 / 无结果提示。加载失败时显示终端风格的错误提示并提供重试。
+页面状态：空查询提示 → 加载中提示 → 结果 / 无结果提示。加载失败时显示终端风格的错误提示并提供重试；重试会重新请求索引。
 
 ### D7：URL 深链与查询上限
 
-输入变化经短防抖后以 `history.replaceState` 写入 `?q=`，不产生历史记录堆积；空查询时移除 `q` 参数。页面加载时读取 `q` 并执行查询。
+输入变化经短防抖后以 `history.replaceState` 写入当前页面 URL 的 `?q=`，不产生历史记录堆积；空查询或关闭浮层时移除 `q` 参数，避免刷新时重复弹出。页面加载时读取 `q` 并自动打开浮层执行查询。
 
 查询长度上限 120 个字符：输入框设置 `maxlength`，深链中更长的 `q` 先截断再执行。查询内容只作为文本处理，渲染前必须转义。
 
 ### D8：结果与可访问性
 
-每条结果为原生 `<a>`，内部包含序号、标题、日期 · 标签、上下文文本。输入框有可见 label；结果计数通过 `aria-live="polite"` 播报；`<mark>` 使用 accent 配色。Enter 打开首条结果，Esc 清空并保持焦点；结果可由 Tab 逐个访问。视口 <768px 不自动聚焦。
+浮层使用原生 `<dialog>` + `showModal()`，获得焦点陷阱、遮罩与 `Esc` 关闭能力。每条结果为原生 `<a>`，内部包含序号、标题、日期 · 标签、上下文文本；当前选中项以边框与底色标出。输入框有 label；结果计数通过 `aria-live="polite"` 播报；`<mark>` 使用 accent 配色。`↑`/`↓` 循环移动选中项，Enter 打开选中结果，Esc 关闭并把焦点还给页头按钮；结果可由 Tab 逐个访问。通过按钮或快捷键主动打开时始终聚焦输入框；`?q=` 深链自动打开时，视口 <768px 不自动聚焦。
 
 ### D9：文件落点
 
 - `src/utils/search-index.ts`：Markdown 去标记（构建期与测试共用）。
 - `src/pages/search-index.json.ts`：索引端点，记录 URL 经 `withBase()` 生成。
-- `src/pages/search.astro`：页面结构、终端风格静态骨架与内联脚本入口。
+- `src/components/SearchDialog.astro`：浮层结构（原生 `<dialog>`）、终端风格静态骨架与脚本入口，挂在 `BaseLayout`，全站可用。
 - `src/scripts/search-core.js`：无 DOM 依赖的归一化、分词、匹配、排序、摘要与高亮，供浏览器脚本和单元测试共用。
-- `src/scripts/blog-search.ts`：DOM 绑定、索引懒加载、状态文案、URL 与键盘逻辑（由页面 `<script>` 导入，Astro 负责打包）。
-- `src/components/Header.astro`：新增「搜索」导航项，复用 `HeaderLink` 与 `withBase()`。
-- `tests/search-core.test.mjs`、`tests/search-index.test.mjs`：`node --test` 单元测试。
+- `src/scripts/search-session.js`：无 DOM 依赖的会话状态机（查询、加载/结果/错误、选中项、预加载、迟到响应隔离），供 DOM 绑定与单元测试共用。
+- `src/scripts/search-dialog.ts`：DOM 绑定、结果渲染、URL 与键盘逻辑（由浮层 `<script>` 导入，Astro 负责打包）。
+- `src/components/Header.astro`：用搜索按钮替换原「搜索」导航项，按钮唤起浮层。
+- `tests/search-core.test.mjs`、`tests/search-index.test.mjs`、`tests/search-session.test.mjs`：`node --test` 单元测试。
 
 ### D10：不新增依赖、不改构建脚本
 
@@ -119,6 +120,6 @@
 
 ## Migration Plan
 
-- 合并即生效：构建产出新增 `/search/` 与 `/search-index.json`，无数据迁移、无配置变更；sitemap 按现有规则新增 `/search/`。
+- 合并即生效：构建产出新增 `/search-index.json`，不再生成 `/search/`，无数据迁移、无配置变更；sitemap 不包含 `/search/`。
 - 回滚：还原对应提交即可恢复原状，站点为纯静态无持久状态。
 - 发布后验证：`npm run build` 成功；索引 gzip 体积 ≤30KB；上述规格场景手动走查。
