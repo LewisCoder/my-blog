@@ -1,5 +1,5 @@
 ---
-import { SITE_TITLE } from '../consts';
+import { SITE_REPO, SITE_TITLE } from '../consts';
 import { withBase } from '../utils/url';
 import HeaderLink from './HeaderLink.astro';
 ---
@@ -44,7 +44,7 @@ import HeaderLink from './HeaderLink.astro';
 			</button>
 			<HeaderLink href="/about/">关于</HeaderLink>
 			<a
-				href="https://github.com/"
+				href={SITE_REPO}
 				target="_blank"
 				rel="noreferrer"
 				class="ml-1 hidden rounded-md border border-edge px-3 py-1.5 font-mono text-[13px] text-slate-400 no-underline transition-colors hover:border-accent/40 hover:text-accent sm:block"

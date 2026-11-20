@@ -1,12 +1,12 @@
 ---
-import { SITE_AUTHOR, SITE_ROLE } from '../consts';
+import { SITE_ROLE, SITE_TITLE } from '../consts';
 
-const profile = `{
-  "author": "${SITE_AUTHOR}",
+const siteProfile = `{
+  "site": "${SITE_TITLE}",
   "role": "${SITE_ROLE}",
-  "lang": ["Java", "TypeScript"],
-  "focus": ["backend", "performance", "clean code"],
-  "motto": "Talk is cheap. Show me the code."
+  "stack": ["Astro", "TypeScript", "Tailwind CSS"],
+  "content": ["Markdown", "RSS", "站内搜索"],
+  "deploy": "GitHub Pages"
 }`;
 ---
 
@@ -23,15 +23,15 @@ const profile = `{
 			<span class="size-2.5 rounded-full bg-[#ff5f57]"></span>
 			<span class="size-2.5 rounded-full bg-[#febc2e]"></span>
 			<span class="size-2.5 rounded-full bg-[#28c840]"></span>
-			<span class="ml-2 font-mono text-[11px] text-slate-500">~/profile.json</span>
+			<span class="ml-2 font-mono text-[11px] text-slate-500">~/site.json</span>
 			<span class="ml-auto font-mono text-[10px] text-slate-600">UTF-8</span>
 		</div>
 		<div class="p-5 font-mono text-[13px] leading-6">
 			<p class="text-slate-500">
 				<span class="text-accent">$</span>
-				<span class="text-slate-300">cat profile.json</span>
+				<span class="text-slate-300">cat site.json</span>
 			</p>
-			<pre class="mt-3 whitespace-pre-wrap text-slate-400">{profile}</pre>
+			<pre class="mt-3 whitespace-pre-wrap text-slate-400">{siteProfile}</pre>
 			<p class="mt-3 text-slate-500">
 				<span class="text-accent">$</span>
 				<span class="ml-2 inline-block h-3.5 w-2 animate-blink bg-accent/80 align-middle"></span>

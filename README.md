@@ -31,7 +31,7 @@ src/
 ├── scripts/            # 客户端脚本（搜索浮层会话与 DOM 绑定）
 ├── styles/global.css   # Tailwind 入口与主题配置
 ├── utils/              # 文章查询、URL 与索引构建工具
-├── consts.ts           # 站点名称、描述、作者
+├── consts.ts           # 站点名称、描述、身份与仓库地址
 └── content.config.ts   # 内容集合与 Frontmatter 校验
 ```
 
@@ -76,7 +76,7 @@ draft: false
 
 ## 自定义
 
-- 站点名称、描述、作者：修改 `src/consts.ts`
+- 站点名称、描述、身份与仓库地址：修改 `src/consts.ts`
 - 站点域名（影响 RSS 与 sitemap）：修改 `astro.config.mjs` 中的 `site`
 - 导航菜单：修改 `src/components/Header.astro`
 - 关于页内容：修改 `src/pages/about.astro`

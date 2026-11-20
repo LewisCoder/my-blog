@@ -1,5 +1,5 @@
 ---
-import { SITE_AUTHOR } from '../consts';
+import { SITE_REPO, SITE_TITLE } from '../consts';
 import { withBase } from '../utils/url';
 
 const today = new Date();
@@ -10,13 +10,13 @@ const today = new Date();
 		class="mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 py-10 font-mono text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-between sm:px-6 lg:px-8"
 	>
 		<p>
-			© {today.getFullYear()} {SITE_AUTHOR}
+			© {today.getFullYear()} {SITE_TITLE}
 			<span class="ml-2 text-slate-700">// built with Astro &amp; Tailwind CSS</span>
 		</p>
 		<div class="flex items-center gap-5">
 			<a href={withBase('/rss.xml')} class="no-underline transition-colors hover:text-accent">rss ↗</a>
 			<a
-				href="https://github.com/"
+				href={SITE_REPO}
 				target="_blank"
 				rel="noreferrer"
 				class="no-underline transition-colors hover:text-accent">github ↗</a

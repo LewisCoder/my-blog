@@ -4,7 +4,7 @@ import type { MarkdownHeading } from 'astro';
 import type { CollectionEntry } from 'astro:content';
 import FormattedDate from '../components/FormattedDate.astro';
 import TagList from '../components/TagList.astro';
-import { SITE_AUTHOR } from '../consts';
+import { SITE_TITLE } from '../consts';
 import { getReadingTime } from '../utils/reading-time';
 import { withBase } from '../utils/url';
 import BaseLayout from './BaseLayout.astro';
@@ -39,7 +39,7 @@ const ogImage = heroImage
 const article = {
 	publishedTime: pubDate.toISOString(),
 	...(updatedDate ? { updatedTime: updatedDate.toISOString() } : {}),
-	author: SITE_AUTHOR,
+	author: SITE_TITLE,
 	tags,
 };
 
@@ -50,7 +50,7 @@ const jsonLd: Record<string, unknown> = {
 	description,
 	datePublished: pubDate.toISOString(),
 	...(updatedDate ? { dateModified: updatedDate.toISOString() } : {}),
-	author: { '@type': 'Person', name: SITE_AUTHOR },
+	author: { '@type': 'Organization', name: SITE_TITLE, url: siteURL.href },
 	...(ogImage ? { image: new URL(ogImage.src, siteURL).href } : {}),
 	mainEntityOfPage: {
 		'@type': 'WebPage',
